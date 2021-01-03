@@ -2451,8 +2451,13 @@ builtin_sum_impl(PyObject *module, PyObject *iterable, PyObject *start)
         Py_DECREF(result);
         Py_DECREF(item);
         result = temp;
-        if (result == NULL)
+        if (result == NULL) {
+	  if (PyUnicode_Check(item) || PyBytes_Check(item) || PyByteArray_Check(item))
+	      PyErr_SetString(PyExc_TypeError,
+		    "sum() can't sum bytes, strings or byte-arrays [use .join(seq) instead]");
+	    }
             break;
+	}
     }
     Py_DECREF(iter);
     return result;
